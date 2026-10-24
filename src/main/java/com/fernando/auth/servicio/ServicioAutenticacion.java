@@ -2,6 +2,7 @@ package com.fernando.auth.servicio;
 
 import com.fernando.auth.jwt.*;
 import com.fernando.auth.password.HashContrasena;
+import com.fernando.auth.password.ValidadorContrasena;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -41,6 +42,11 @@ public class ServicioAutenticacion {
         String clave = usuario.trim().toLowerCase();
         if (usuarios.containsKey(clave)) {
             throw new AutenticacionException("El usuario '" + clave + "' ya existe");
+        }
+        List<String> problemas = ValidadorContrasena.validar(contrasena);
+        if (!problemas.isEmpty()) {
+            throw new AutenticacionException(
+                    "Contrasena no cumple los requisitos: " + String.join("; ", problemas));
         }
         Usuario nuevo = new Usuario(usuario, email, HashContrasena.hashear(contrasena), roles);
         usuarios.put(clave, nuevo);
