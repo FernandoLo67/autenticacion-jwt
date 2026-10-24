@@ -41,6 +41,27 @@ formato guardado:  iteraciones : sal(base64) : hash(base64)
 
 El refresco usa **rotacion**: al canjearlo se emite un par nuevo y el anterior queda en la lista negra. Reutilizar un refresco viejo es senal de robo y se rechaza.
 
+## Estructura
+
+```
+src/main/java/com/fernando/auth/
+├── jwt/
+│   ├── Algoritmo.java            HS256, HS384, HS512; rechaza "none"
+│   ├── Base64Url.java            Codificacion sin relleno (RFC 7515)
+│   ├── Claims.java               Contenido del token, con builder
+│   ├── EmisorJwt.java            Firma y verificacion sobre javax.crypto
+│   ├── Json.java                 Parser de JSON escrito a mano
+│   └── *Exception.java           Firma invalida, token expirado, mal formado
+├── password/
+│   ├── HashContrasena.java       PBKDF2-HMAC-SHA256, 210k iteraciones
+│   └── ValidadorContrasena.java  Reglas de complejidad (OWASP)
+└── servicio/
+    ├── ServicioAutenticacion.java Registro, login, refresco, autorizacion
+    ├── Usuario.java              Modelo con roles y estado activo/bloqueado
+    ├── Rol.java                  ADMIN, USUARIO
+    └── ParDeTokens.java          Acceso + refresco
+```
+
 ## Que muestra este proyecto
 
 - Criptografia aplicada con la API estandar de Java: `Mac` (HMAC-SHA256/384/512), `SecretKeyFactory` (PBKDF2), `SecureRandom`, `MessageDigest.isEqual`.
@@ -52,7 +73,7 @@ El refresco usa **rotacion**: al canjearlo se emite un par nuevo y el anterior q
 
 ## Pruebas
 
-**59 pruebas.** Las que mas valen son las adversariales: token con el contenido manipulado, token firmado con otra clave, `alg:none`, algoritmo sustituido, token de refresco usado como token de acceso, refresco reutilizado despues de la rotacion, y token emitido por un emisor ajeno.
+**69 pruebas.** Las que mas valen son las adversariales: token con el contenido manipulado, token firmado con otra clave, `alg:none`, algoritmo sustituido, token de refresco usado como token de acceso, refresco reutilizado despues de la rotacion, y token emitido por un emisor ajeno.
 
 ## Como ejecutar
 
